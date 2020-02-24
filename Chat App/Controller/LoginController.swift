@@ -68,11 +68,6 @@ class LoginController: UIViewController {
                 print(error.debugDescription)
                 return
             }
-            
-            guard let uid = res?.user.uid else {
-                return
-            }
-            
             self.dismiss(animated: true, completion: nil)
         }
     }

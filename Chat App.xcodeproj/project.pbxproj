@@ -19,6 +19,9 @@
 		181C13682402D93E00BA2027 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C13672402D93E00BA2027 /* User.swift */; };
 		1821ECA92403CD760087A1BB /* UsersCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECA82403CD760087A1BB /* UsersCell.swift */; };
 		1821ECAD2403D4C20087A1BB /* LoginController+imagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECAC2403D4C20087A1BB /* LoginController+imagePicker.swift */; };
+		1821ECB22403FECC0087A1BB /* ChatMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECB12403FECC0087A1BB /* ChatMessages.swift */; };
+		1821ECB42403FEDB0087A1BB /* ChatMessagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECB32403FEDB0087A1BB /* ChatMessagesCell.swift */; };
+		1821ECB6240402DE0087A1BB /* ChatMessagesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECB5240402DE0087A1BB /* ChatMessagesModel.swift */; };
 		7A814A8AC74AA0D6A2F7044E /* Pods_Chat_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3B9AA55A454646A5308001D /* Pods_Chat_App.framework */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +40,9 @@
 		181C13672402D93E00BA2027 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		1821ECA82403CD760087A1BB /* UsersCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersCell.swift; sourceTree = "<group>"; };
 		1821ECAC2403D4C20087A1BB /* LoginController+imagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginController+imagePicker.swift"; sourceTree = "<group>"; };
+		1821ECB12403FECC0087A1BB /* ChatMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessages.swift; sourceTree = "<group>"; };
+		1821ECB32403FEDB0087A1BB /* ChatMessagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCell.swift; sourceTree = "<group>"; };
+		1821ECB5240402DE0087A1BB /* ChatMessagesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesModel.swift; sourceTree = "<group>"; };
 		18C2E9022402868100CA2537 /* Chat App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Chat App.entitlements"; sourceTree = "<group>"; };
 		551A03BC72A83D4C8B8405A5 /* Pods-Chat App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chat App.debug.xcconfig"; path = "Target Support Files/Pods-Chat App/Pods-Chat App.debug.xcconfig"; sourceTree = "<group>"; };
 		B3B9AA55A454646A5308001D /* Pods_Chat_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Chat_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,6 +112,8 @@
 				0564DE332370B24100F531E0 /* MessagesController.swift */,
 				181C13642402D2FF00BA2027 /* NewMessageController.swift */,
 				1821ECA82403CD760087A1BB /* UsersCell.swift */,
+				1821ECB12403FECC0087A1BB /* ChatMessages.swift */,
+				1821ECB32403FEDB0087A1BB /* ChatMessagesCell.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -114,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				181C13672402D93E00BA2027 /* User.swift */,
+				1821ECB5240402DE0087A1BB /* ChatMessagesModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -251,6 +260,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1821ECB6240402DE0087A1BB /* ChatMessagesModel.swift in Sources */,
 				0564DE342370B24100F531E0 /* MessagesController.swift in Sources */,
 				181C13652402D2FF00BA2027 /* NewMessageController.swift in Sources */,
 				181C13682402D93E00BA2027 /* User.swift in Sources */,
@@ -259,6 +269,8 @@
 				1821ECA92403CD760087A1BB /* UsersCell.swift in Sources */,
 				0564DE322370B24100F531E0 /* AppDelegate.swift in Sources */,
 				1821ECAD2403D4C20087A1BB /* LoginController+imagePicker.swift in Sources */,
+				1821ECB22403FECC0087A1BB /* ChatMessages.swift in Sources */,
+				1821ECB42403FEDB0087A1BB /* ChatMessagesCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

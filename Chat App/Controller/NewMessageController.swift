@@ -29,6 +29,7 @@ class NewMessageController: UITableViewController {
                 let user = User()
                 user.email = dict["email"] as? String
                 user.name = dict["name"] as? String
+                user.profileImageUrl = dict["profileImageUrl"] as? String
                 self.user.append(user)
                 self.tableView.reloadData()
             }
@@ -47,6 +48,13 @@ class NewMessageController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! UsersCell
         cell.textLabel?.text = self.user[indexPath.item].name
         cell.detailTextLabel?.text = self.user[indexPath.item].email
+        if let profileImageUrl = user[indexPath.item].profileImageUrl {
+            cell.profileImageView.loadImageUsingCacheWithUrlString(profileImageUrl)
+        }
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+           return 72
     }
 }

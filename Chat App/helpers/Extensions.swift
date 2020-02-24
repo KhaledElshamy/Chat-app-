@@ -16,28 +16,42 @@ extension UIColor {
     }
 }
 
+let imageCache = NSCache<NSString, AnyObject>()
+
 extension UIImageView {
-    func downloadImage(imageURL : String){
+    
+    func loadImageUsingCacheWithUrlString(_ urlString: String) {
         
-        let http = imageURL
+        self.image = nil
         
-        let request = NSMutableURLRequest(url: NSURL(string: http)! as URL, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
-        request.httpMethod = "GET"
+        //check cache for image first
+        if let cachedImage = imageCache.object(forKey: urlString as NSString) as? UIImage {
+            self.image = cachedImage
+            return
+        }
         
-        _ = URLSession.shared.dataTask(with: request as URLRequest) { (data, response, error) in
-            if error != nil {
-                print(error!)
+        //otherwise fire off a new download
+        let url = URL(string: urlString)
+        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+            
+            //download hit an error so lets return out
+            if let error = error {
+                print(error)
                 return
             }
-            else{
-                let data = NSData(data: data!)
-                DispatchQueue.main.sync {
-                    let image = UIImage(data: data as Data)
-                    self.image = image
+            
+            DispatchQueue.main.async(execute: {
+                
+                if let downloadedImage = UIImage(data: data!) {
+                    imageCache.setObject(downloadedImage, forKey: urlString as NSString)
+                    
+                    self.image = downloadedImage
                 }
-            }
-            }.resume()
+            })
+            
+        }).resume()
     }
+    
 }
 
 

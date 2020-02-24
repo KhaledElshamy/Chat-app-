@@ -63,8 +63,13 @@ class LoginController: UIViewController {
     @objc func handleLogin(){
         guard let email = emailTextField.text, let pass = passwordTextField.text else {return}
         Auth.auth().signIn(withEmail: email, password: pass) { (res, error) in
+            
             if error != nil {
                 print(error.debugDescription)
+                return
+            }
+            
+            guard let uid = res?.user.uid else {
                 return
             }
             

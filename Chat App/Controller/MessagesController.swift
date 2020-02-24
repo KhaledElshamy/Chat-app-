@@ -36,8 +36,9 @@ class MessagesController: UITableViewController {
         if Auth.auth().currentUser?.uid == nil {
             performSelector(onMainThread: #selector(logOut), with: nil, waitUntilDone: true)
         }else {
-           // let uid = Auth.auth().currentUser!.uid
-            let ref = Database.database().reference().child("Users").child("-M0mds5XJzS9WeSW5-WY")
+            let uid = Auth.auth().currentUser!.uid
+            print(uid)
+            let ref = Database.database().reference().child("users").child(uid)
             ref.observe(.value, with: { (snapchot) in
                 if let dict = snapchot.value as? [String:Any] {
                     self.navigationItem.title = dict["name"] as? String

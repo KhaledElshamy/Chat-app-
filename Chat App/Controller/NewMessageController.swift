@@ -21,9 +21,8 @@ class NewMessageController: UITableViewController {
         tableView.register(UsersCell.self, forCellReuseIdentifier: "cellId")
     }
     
-    
     func fetchUsersData(){
-        let ref = Database.database().reference().child("Users")
+        let ref = Database.database().reference().child("users")
         ref.observe(.childAdded, with: { (snapchot) in
             if let dict = snapchot.value as? [String:Any] {
                // print(dict)

@@ -10,6 +10,7 @@ pod 'Firebase'
 pod 'Firebase/Auth'
 pod 'Firebase/Database'
 pod 'Firebase/Analytics'
+pod 'Firebase/Storage'
 
 end
 post_install do |installer|

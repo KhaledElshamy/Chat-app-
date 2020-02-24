@@ -21,7 +21,11 @@ class LoginController: UIViewController {
     }()
     
     @objc func handlePlusPhoto(){
-        
+        let pickerController = UIImagePickerController()
+        pickerController.delegate = self
+        pickerController.allowsEditing = true
+        pickerController.sourceType = .photoLibrary
+        showImagePickerVC(vc: pickerController)
     }
     
     
@@ -68,28 +72,6 @@ class LoginController: UIViewController {
         }
     }
     
-    @objc func handleRegister(){
-        guard let email = emailTextField.text, let pass = passwordTextField.text , let name = nameTextField.text else {return }
-        Auth.auth().createUser(withEmail: email, password: pass) { (res, error) in
-            if error != nil {
-                print(error.debugDescription)
-                return
-            }
-            
-            let ref = Database.database().reference(fromURL: "https://chat-app-d5e48.firebaseio.com/")
-            let userPref = ref.child("Users").childByAutoId()
-            let values = ["name":name,"email":email,"password":pass]
-            userPref.updateChildValues(values) { (error, ref) in
-                if error != nil{
-                    print("error")
-                    return
-                }
-            }
-           
-            self.dismiss(animated: true, completion: nil)
-        }
-    }
-    
     let loginRegisterSegmentedControl: UISegmentedControl = {
         let SC = UISegmentedControl(items: ["Login" , "Register"])
         SC.translatesAutoresizingMaskIntoConstraints = false
@@ -113,6 +95,7 @@ class LoginController: UIViewController {
             
             stackView.distribution = .fillEqually
             stackView.axis = .vertical
+            self.plusPhotoButton.isHidden = true
         }else if index == 1 {
         
             stackView.addArrangedSubview(nameTextField)
@@ -120,6 +103,7 @@ class LoginController: UIViewController {
             stackView.addArrangedSubview(passwordTextField)
             stackView.distribution = .fillEqually
             stackView.axis = .vertical
+             self.plusPhotoButton.isHidden = false
         }
     }
     

@@ -55,7 +55,7 @@ class NewMessageController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let vc = ChatMessagesVontroller()
+        let vc = ChatMessagesController()
         self.navigationController?.pushViewController(vc, animated: true )
     }
     

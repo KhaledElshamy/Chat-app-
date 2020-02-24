@@ -12,12 +12,13 @@ import Firebase
 class NewMessageController: UITableViewController {
     
     
-    let user = [User]()
+    var user = [User]()
     override func viewDidLoad() {
         super.viewDidLoad()
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(back))
         fetchUsersData()
+        tableView.register(UsersCell.self, forCellReuseIdentifier: "cellId")
     }
     
     
@@ -25,9 +26,12 @@ class NewMessageController: UITableViewController {
         let ref = Database.database().reference().child("Users")
         ref.observe(.childAdded, with: { (snapchot) in
             if let dict = snapchot.value as? [String:Any] {
+               // print(dict)
                 let user = User()
-                user.setValuesForKeys(dict)
-                print(user.name, user.email)
+                user.email = dict["email"] as? String
+                user.name = dict["name"] as? String
+                self.user.append(user)
+                self.tableView.reloadData()
             }
         }, withCancel: nil)
     }
@@ -36,14 +40,14 @@ class NewMessageController: UITableViewController {
         self.dismiss(animated: true, completion:nil)
     }
     
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return self.user.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cellId")
-        cell.textLabel?.text = "sdfksdbfkhsd"
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! UsersCell
+        cell.textLabel?.text = self.user[indexPath.item].name
+        cell.detailTextLabel?.text = self.user[indexPath.item].email
         return cell
     }
 }

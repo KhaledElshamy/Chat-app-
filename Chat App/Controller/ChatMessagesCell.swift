@@ -10,7 +10,7 @@ import UIKit
 
 
 class ChatMessageCell: UITableViewCell {
-
+    
     let messageLabel = UILabel()
     let bubbleBackgroundView = UIView()
         
@@ -36,18 +36,17 @@ class ChatMessageCell: UITableViewCell {
         
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
-            
+        
+            selectionStyle = .none
             backgroundColor = .clear
             
             bubbleBackgroundView.layer.cornerRadius = 12
             bubbleBackgroundView.translatesAutoresizingMaskIntoConstraints = false
             addSubview(bubbleBackgroundView)
             
+        
             addSubview(messageLabel)
-   
-            messageLabel.text = "We want to provide a longer string that is actually going to wrap onto the next line and maybe even a third line."
             messageLabel.numberOfLines = 0
-            
             messageLabel.translatesAutoresizingMaskIntoConstraints = false
             
             // lets set up some constraints for our label

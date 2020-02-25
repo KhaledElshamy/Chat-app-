@@ -13,30 +13,42 @@ class ChatMessagesController:UITableViewController {
     
     fileprivate let cellId = "id123"
     
-    let chatMessages = [
-         [
-             ChatMessage(text: "Here's my very first message", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
-             ChatMessage(text: "I'm going to message another long message that will word wrap", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
-         ],
-         [
-             ChatMessage(text: "I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap", isIncoming: false, date: Date.dateFromCustomString(customString: "09/15/2018")),
-             ChatMessage(text: "Yo, dawg, Whaddup!", isIncoming: false, date: Date()),
-             ChatMessage(text: "This message should appear on the left with a white background bubble", isIncoming: true, date: Date.dateFromCustomString(customString: "09/15/2018")),
-         ],
-         [
-             ChatMessage(text: "Third Section message", isIncoming: true, date: Date.dateFromCustomString(customString: "10/31/2018"))
-         ]
-     ]
+    var chatMessages = [[ChatMessage]]()
+    
+    let messagesFromServer = [
+        ChatMessage(text: "Here's my very first message", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
+        ChatMessage(text: "I'm going to message another long message that will word wrap", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
+        ChatMessage(text: "I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap", isIncoming: false, date: Date.dateFromCustomString(customString: "09/15/2018")),
+        ChatMessage(text: "Yo, dawg, Whaddup!", isIncoming: false, date: Date()),
+        ChatMessage(text: "This message should appear on the left with a white background bubble", isIncoming: true, date: Date.dateFromCustomString(customString: "09/15/2018")),
+        ChatMessage(text: "Third Section message", isIncoming: true, date: Date.dateFromCustomString(customString: "10/31/2018"))
+    ]
+    
+    fileprivate func attemptToAssembleGroupedMessages() {
+           print("Attempt to group our messages together based on Date property")
+           
+           let groupedMessages = Dictionary(grouping: messagesFromServer) { (element) -> Date in
+               return element.date.reduceToMonthDayYear()
+        }
+           
+           // provide a sorting for your keys somehow
+           let sortedKeys = groupedMessages.keys.sorted()
+           sortedKeys.forEach { (key) in
+               let values = groupedMessages[key]
+               chatMessages.append(values ?? [])
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        attemptToAssembleGroupedMessages()
         navigationItem.title = "Messages"
         
         tableView.register(ChatMessageCell.self, forCellReuseIdentifier: cellId)
         tableView.separatorStyle = .none
         tableView.backgroundColor = UIColor(white: 0.95, alpha: 1)
-        self.tableView.reloadData()
+        tableView.showsVerticalScrollIndicator = false
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

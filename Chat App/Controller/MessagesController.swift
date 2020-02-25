@@ -122,11 +122,12 @@ class MessagesController: UITableViewController {
            return cell
        }
        
-       override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-           let vc = ChatMessagesController()
-           vc.user = self.MyContacts[indexPath.item]
-           self.navigationController?.pushViewController(vc, animated: true )
-       }
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let vc = ChatMessagesController()
+        vc.user = self.MyContacts[indexPath.item]
+        vc.navigationItem.title = MyContacts[indexPath.item].name
+        self.navigationController?.pushViewController(vc, animated: true )
+    }
        
        override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
               return 72

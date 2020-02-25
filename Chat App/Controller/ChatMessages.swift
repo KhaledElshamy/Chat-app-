@@ -167,7 +167,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         super.viewDidLoad()
            
         attemptToAssembleGroupedMessages()
-        navigationItem.title = "Messages"
+        //navigationItem.title = "Messages"
         tableView.register(ChatMessageCell.self, forCellReuseIdentifier: cellId)
         tableView.separatorStyle = .none
         tableView.backgroundColor = UIColor(white: 0.95, alpha: 1)

@@ -59,6 +59,7 @@ class NewMessageController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = ChatMessagesController()
         vc.user = self.user[indexPath.item]
+        vc.navigationItem.title = self.user[indexPath.item].name
         self.navigationController?.pushViewController(vc, animated: true )
     }
     

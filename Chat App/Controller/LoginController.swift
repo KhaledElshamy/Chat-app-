@@ -11,6 +11,8 @@ import Firebase
 
 class LoginController: UIViewController {
     
+    var messagesController: MessagesController?
+    
     var stackView = UIStackView()
     
     let plusPhotoButton: UIButton = {
@@ -68,6 +70,8 @@ class LoginController: UIViewController {
                 print(error.debugDescription)
                 return
             }
+            self.messagesController?.navigationItem.title = ""
+            self.messagesController?.FetchUserAndSetupNavBarTitle()
             self.dismiss(animated: true, completion: nil)
         }
     }

@@ -33,7 +33,15 @@ extension Date {
         dateFormatter.dateFormat = "MM/dd/yyyy"
         return dateFormatter.date(from: "\(month)/\(day)/\(year)") ?? Date()
     }
+    
+    
+    func DateString()-> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        return dateFormatter.string(from: Date())
+    }
 }
+
 
 let imageCache = NSCache<NSString, AnyObject>()
 

@@ -20,6 +20,7 @@ class NewMessageController: UITableViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(back))
         fetchUsersData()
         tableView.register(UsersCell.self, forCellReuseIdentifier: "cellId")
+        self.tableView.separatorStyle = .none
     }
     
     func fetchUsersData(){

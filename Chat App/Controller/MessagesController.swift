@@ -48,6 +48,7 @@ class MessagesController: UITableViewController {
         CheckIfUserIsLogin()
         tableView.register(UsersCell.self, forCellReuseIdentifier: "cellId")
         print(self.MyContacts.count)
+        self.tableView.separatorStyle = .none
     }
     
     
@@ -70,8 +71,10 @@ class MessagesController: UITableViewController {
     
     
     func FetchUserAndSetupNavBarTitle(){
-        observeMessages()
-       
+        self.messages.removeAll()
+        self.messagesDictionary.removeAll()
+
+        ObserevUserMessages()
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
@@ -84,23 +87,29 @@ class MessagesController: UITableViewController {
     }
     
     
-    func observeMessages(){
-        let ref = Database.database().reference().child("messages")
-        ref.observe(.childAdded, with: { (snapchot) in
-            if let dict = snapchot.value as? [String:Any] {
-               let message = MyContactsMessages(dictionary: dict)
-                if let told = message.toId {
-                    self.messagesDictionary[told] = message
-                    self.messages = Array(self.messagesDictionary.values)
-                    self.messages.sort(by: { (message1, message2) -> Bool in
-                        return message1.timestamp?.int32Value > message2.timestamp?.int32Value
-                    })
-                }
-                
-                DispatchQueue.main.async(execute: {
+    func ObserevUserMessages(){
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference().child("user_messages").child(uid)
+        ref.observe(.childAdded, with: { (snapshot) in
+            let messageId = snapshot.key
+            let messagegeRef = Database.database().reference().child("messages").child(messageId)
+            messagegeRef.observe(.value, with: { (snapshot) in
+                if let dict = snapshot.value as? [String:Any] {
+                    let message = MyContactsMessages(dictionary: dict)
+                    if let told = message.toId {
+                        self.messagesDictionary[told] = message
+                        self.messages = Array(self.messagesDictionary.values)
+                        self.messages.sort(by: { (message1, message2) -> Bool in
+                            return message1.timestamp?.int32Value > message2.timestamp?.int32Value
+
+                        })
+                 }
                     self.tableView.reloadData()
-                })
-            }
+                }
+            }, withCancel: nil)
+            
         }, withCancel: nil)
     }
     
@@ -135,14 +144,9 @@ class MessagesController: UITableViewController {
         let vc = ChatMessagesController()
         if let name = self.messages[indexPath.item].name {
             vc.userName = name
-            vc.navigationItem.title = name
+            vc.navigationItem.title = "Messages"
         }
-        
-        if let toId = self.messages[indexPath.item].toId {
-            vc.sendToId = toId
-        }
-//        vc.user = self.MyContacts[indexPath.item]
-//        vc.navigationItem.title = MyContacts[indexPath.item].name
+ 
         self.navigationController?.pushViewController(vc, animated: true )
     }
        

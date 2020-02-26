@@ -107,10 +107,25 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         
         let date = Date().DateString()
         let timestamp = Int(Date().timeIntervalSince1970)
+        let fromId = uid
         
         //is it there best thing to include the name inside of the message node
-        let values = ["text": inputTextField.text!, "name": userName,"sendToId":sendToId,"fromId":uid,"date":date,"timestamp":timestamp] as [String : Any]
-        childRef.updateChildValues(values)
+        let values = ["text": inputTextField.text!, "name": userName,"sendToId":sendToId,"fromId":fromId,"date":date,"timestamp":timestamp] as [String : Any]
+        //childRef.updateChildValues(values)
+        childRef.updateChildValues(values) { (error, ref) in
+            if error != nil {
+                print(error.debugDescription)
+                return
+            }
+            
+            let userMessagesRef = Database.database().reference().child("user_messages").child(fromId)
+            let messageId = childRef.key
+            let subValues = [messageId:1]
+            userMessagesRef.updateChildValues(subValues)
+            
+            let recipientUserMessagesRef = Database.database().reference().child("user_messages").child(self.sendToId)
+            recipientUserMessagesRef.updateChildValues(subValues)
+        }
     }
        
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

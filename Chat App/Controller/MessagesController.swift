@@ -94,11 +94,12 @@ class MessagesController: UITableViewController {
         let ref = Database.database().reference().child("user_messages").child(uid)
         ref.observe(.childAdded, with: { (snapshot) in
             let messageId = snapshot.key
+            print(messageId)
             let messagegeRef = Database.database().reference().child("messages").child(messageId)
             messagegeRef.observe(.value, with: { (snapshot) in
                 if let dict = snapshot.value as? [String:Any] {
                     let message = MyContactsMessages(dictionary: dict)
-                    if let told = message.toId {
+                    if let told = message.chatPartnerId() {
                         self.messagesDictionary[told] = message
                         self.messages = Array(self.messagesDictionary.values)
                         self.messages.sort(by: { (message1, message2) -> Bool in

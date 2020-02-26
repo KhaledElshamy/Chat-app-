@@ -24,7 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let VC = MessagesController()
         let nav = UINavigationController(rootViewController: VC)
         window?.rootViewController = nav
-        
         return true
     }
 

@@ -11,8 +11,9 @@ import Firebase
 
 class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate {
     
-    
     var user = User()
+    var userName = String()
+    var sendToId = String()
     
     lazy var tableView:UITableView = {
         let tableView = UITableView()
@@ -105,9 +106,10 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         let childRef = ref.childByAutoId()
         
         let date = Date().DateString()
+        let timestamp = Int(Date().timeIntervalSince1970)
         
         //is it there best thing to include the name inside of the message node
-        let values = ["text": inputTextField.text!, "name": self.user.name!,"sendToId":user.id!,"fromId":uid,"date":date]
+        let values = ["text": inputTextField.text!, "name": userName,"sendToId":sendToId,"fromId":uid,"date":date,"timestamp":timestamp] as [String : Any]
         childRef.updateChildValues(values)
     }
        

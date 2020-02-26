@@ -11,10 +11,33 @@ import Firebase
 import FirebaseAuth
 
 
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 class MessagesController: UITableViewController {
 
-    var messages: Set<String> = []
     var MyContacts = [User]()
+    var messages = [MyContactsMessages]()
+    var messagesDictionary = [String: MyContactsMessages]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,6 +71,7 @@ class MessagesController: UITableViewController {
     
     func FetchUserAndSetupNavBarTitle(){
         observeMessages()
+       
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
@@ -64,32 +88,20 @@ class MessagesController: UITableViewController {
         let ref = Database.database().reference().child("messages")
         ref.observe(.childAdded, with: { (snapchot) in
             if let dict = snapchot.value as? [String:Any] {
-                if !self.messages.contains(dict["sendToId"] as! String){
-                    self.messages.insert(dict["sendToId"] as! String)
-                    self.getMyContacts()
+               let message = MyContactsMessages(dictionary: dict)
+                if let told = message.toId {
+                    self.messagesDictionary[told] = message
+                    self.messages = Array(self.messagesDictionary.values)
+                    self.messages.sort(by: { (message1, message2) -> Bool in
+                        return message1.timestamp?.int32Value > message2.timestamp?.int32Value
+                    })
                 }
+                
+                DispatchQueue.main.async(execute: {
+                    self.tableView.reloadData()
+                })
             }
         }, withCancel: nil)
-        
-    }
-    
-    
-    func getMyContacts(){
-        let ref2 = Database.database().reference().child("users")
-           ref2.observe(.childAdded, with: { (snapchot) in
-               if let dict = snapchot.value as? [String:Any] {
-                if self.messages.contains(snapchot.key) {
-                       //print(snapchot.key)
-                       let user = User()
-                       user.email = dict["email"] as? String
-                       user.name = dict["name"] as? String
-                       user.profileImageUrl = dict["profileImageUrl"] as? String
-                       user.id  = snapchot.key
-                       self.MyContacts.append(user)
-                   }
-                   self.tableView.reloadData()
-               }
-           }, withCancel: nil)
     }
     
     @objc func logOut(){
@@ -109,23 +121,28 @@ class MessagesController: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-           return self.MyContacts.count
+           return self.messages.count
        }
        
-       override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-           let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! UsersCell
-           cell.textLabel?.text = self.MyContacts[indexPath.item].name
-           cell.detailTextLabel?.text = self.MyContacts[indexPath.item].email
-           if let profileImageUrl = MyContacts[indexPath.item].profileImageUrl {
-               cell.profileImageView.loadImageUsingCacheWithUrlString(profileImageUrl)
-           }
-           return cell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! UsersCell
+        let message = messages[indexPath.row]
+        cell.message = message
+        return cell
        }
        
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = ChatMessagesController()
-        vc.user = self.MyContacts[indexPath.item]
-        vc.navigationItem.title = MyContacts[indexPath.item].name
+        if let name = self.messages[indexPath.item].name {
+            vc.userName = name
+            vc.navigationItem.title = name
+        }
+        
+        if let toId = self.messages[indexPath.item].toId {
+            vc.sendToId = toId
+        }
+//        vc.user = self.MyContacts[indexPath.item]
+//        vc.navigationItem.title = MyContacts[indexPath.item].name
         self.navigationController?.pushViewController(vc, animated: true )
     }
        

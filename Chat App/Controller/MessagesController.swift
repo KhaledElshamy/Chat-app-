@@ -104,7 +104,6 @@ class MessagesController: UITableViewController {
                         self.messages = Array(self.messagesDictionary.values)
                         self.messages.sort(by: { (message1, message2) -> Bool in
                             return message1.timestamp?.int32Value > message2.timestamp?.int32Value
-
                         })
                  }
                     self.tableView.reloadData()
@@ -139,14 +138,20 @@ class MessagesController: UITableViewController {
         let message = messages[indexPath.row]
         cell.message = message
         return cell
-       }
+    }
        
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = ChatMessagesController()
         if let name = self.messages[indexPath.item].name {
             vc.userName = name
-            vc.navigationItem.title = "Messages"
+            vc.navigationItem.title = name
         }
+        
+        let message = messages[indexPath.item]
+        if let id = message.chatPartnerId() {
+            vc.sendToId = id
+        }
+        
  
         self.navigationController?.pushViewController(vc, animated: true )
     }

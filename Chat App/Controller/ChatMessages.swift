@@ -15,6 +15,8 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
     var userName = String()
     var sendToId = String()
     
+    var messagesFromServer = [ChatMessage]()
+    
     lazy var tableView:UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
@@ -34,20 +36,63 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
     
     var chatMessages = [[ChatMessage]]()
     
-    let messagesFromServer = [
-        ChatMessage(text: "Here's my very first message", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
-        ChatMessage(text: "I'm going to message another long message that will word wrap", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
-        ChatMessage(text: "I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap", isIncoming: false, date: Date.dateFromCustomString(customString: "09/15/2018")),
-        ChatMessage(text: "Yo, dawg, Whaddup!", isIncoming: false, date: Date()),
-        ChatMessage(text: "This message should appear on the left with a white background bubble", isIncoming: true, date: Date.dateFromCustomString(customString: "09/15/2018")),
-        ChatMessage(text: "Third Section message", isIncoming: true, date: Date.dateFromCustomString(customString: "10/31/2018"))
-    ]
+    var messages = [MyContactsMessages]()
+    
+    
+    func observeMessages(){
+        self.messages.removeAll()
+        self.chatMessages.removeAll()
+        self.messagesFromServer.removeAll()
+        self.tableView.reloadData()
+        
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let userMessagesRef = Database.database().reference().child("user_messages").child(uid)
+        userMessagesRef.observe(.childAdded, with: { (snapshot) in
+            
+            let messageId = snapshot.key
+            let messagesRef = Database.database().reference().child("messages").child(messageId)
+            messagesRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                guard let dictionary = snapshot.value as? [String: AnyObject] else {
+                    return
+                }
+                
+                let message = MyContactsMessages(dictionary: dictionary)
+                
+                
+                if message.toId == self.sendToId {
+                    self.messages.append(message)
+                    self.messagesFromServer.append(ChatMessage(text: message.text!, isIncoming: false , date: Date.dateFromCustomString(customString: Date().DateString())))
+                     self.attemptToAssembleGroupedMessages()
+                }else if message.toId == Auth.auth().currentUser?.uid && message.fromId == self.sendToId {
+                    self.messages.append(message)
+                    self.messagesFromServer.append(ChatMessage(text: message.text!, isIncoming: true , date: Date.dateFromCustomString(customString: Date().DateString())))
+                     self.attemptToAssembleGroupedMessages()
+                }
+                DispatchQueue.main.async(execute: {
+                    self.tableView.reloadData()
+                })
+                }, withCancel: nil)
+            
+            }, withCancel: nil)
+    }
+    
+//    let messagesFromServer = [
+//        ChatMessage(text: "Here's my very first message", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
+//        ChatMessage(text: "I'm going to message another long message that will word wrap", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
+//        ChatMessage(text: "I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap", isIncoming: false, date: Date.dateFromCustomString(customString: "09/15/2018")),
+//        ChatMessage(text: "Yo, dawg, Whaddup!", isIncoming: false, date: Date()),
+//        ChatMessage(text: "This message should appear on the left with a white background bubble", isIncoming: true, date: Date.dateFromCustomString(customString: "09/15/2018")),
+//        ChatMessage(text: "Third Section message", isIncoming: true, date: Date.dateFromCustomString(customString: "10/31/2018"))
+//    ]
     
     fileprivate func attemptToAssembleGroupedMessages() {
            let groupedMessages = Dictionary(grouping: messagesFromServer) { (element) -> Date in
                return element.date.reduceToMonthDayYear()
         }
-           
+       // print(groupedMessages.count)
            // provide a sorting for your keys somehow
            let sortedKeys = groupedMessages.keys.sorted()
            sortedKeys.forEach { (key) in
@@ -102,6 +147,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
+        
         let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
         
@@ -125,11 +171,13 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
             
             let recipientUserMessagesRef = Database.database().reference().child("user_messages").child(self.sendToId)
             recipientUserMessagesRef.updateChildValues(subValues)
+            self.observeMessages()
+            self.inputTextField.text = ""
         }
     }
        
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        handleSend()
+       // handleSend()
         return true
     }
     
@@ -182,15 +230,13 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-           
-        attemptToAssembleGroupedMessages()
         //navigationItem.title = "Messages"
         tableView.register(ChatMessageCell.self, forCellReuseIdentifier: cellId)
         tableView.separatorStyle = .none
         tableView.backgroundColor = UIColor(white: 0.95, alpha: 1)
         tableView.showsVerticalScrollIndicator = false
-        self.tableView.reloadData()
         setupConstraints()
+        observeMessages()
     }
 
 }

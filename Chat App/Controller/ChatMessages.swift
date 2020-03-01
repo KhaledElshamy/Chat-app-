@@ -11,7 +11,14 @@ import Firebase
 
 class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate {
     
-    var user = User()
+    var containerViewBottomAnchor: NSLayoutConstraint?
+        var user: User? {
+        didSet {
+            navigationItem.title = user?.name
+            
+            observeMessages()
+        }
+    }
     var userName = String()
     var sendToId = String()
     
@@ -40,11 +47,6 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
     
     
     func observeMessages(){
-        self.messages.removeAll()
-        self.chatMessages.removeAll()
-        self.messagesFromServer.removeAll()
-        self.tableView.reloadData()
-        
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
@@ -63,43 +65,58 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
                 
                 
                 if message.toId == self.sendToId {
-                    self.messages.append(message)
+                    self.chatMessages.removeAll()
                     self.messagesFromServer.append(ChatMessage(text: message.text!, isIncoming: false , date: Date.dateFromCustomString(customString: Date().DateString())))
-                     self.attemptToAssembleGroupedMessages()
+                    self.attemptToAssembleGroupedMessages()
                 }else if message.toId == Auth.auth().currentUser?.uid && message.fromId == self.sendToId {
-                    self.messages.append(message)
+                    self.chatMessages.removeAll()
                     self.messagesFromServer.append(ChatMessage(text: message.text!, isIncoming: true , date: Date.dateFromCustomString(customString: Date().DateString())))
-                     self.attemptToAssembleGroupedMessages()
+                    self.attemptToAssembleGroupedMessages()
                 }
-                DispatchQueue.main.async(execute: {
-                    self.tableView.reloadData()
-                })
                 }, withCancel: nil)
             
             }, withCancel: nil)
     }
-    
-//    let messagesFromServer = [
-//        ChatMessage(text: "Here's my very first message", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
-//        ChatMessage(text: "I'm going to message another long message that will word wrap", isIncoming: true, date: Date.dateFromCustomString(customString: "08/03/2018")),
-//        ChatMessage(text: "I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap, I'm going to message another long message that will word wrap", isIncoming: false, date: Date.dateFromCustomString(customString: "09/15/2018")),
-//        ChatMessage(text: "Yo, dawg, Whaddup!", isIncoming: false, date: Date()),
-//        ChatMessage(text: "This message should appear on the left with a white background bubble", isIncoming: true, date: Date.dateFromCustomString(customString: "09/15/2018")),
-//        ChatMessage(text: "Third Section message", isIncoming: true, date: Date.dateFromCustomString(customString: "10/31/2018"))
-//    ]
+
     
     fileprivate func attemptToAssembleGroupedMessages() {
            let groupedMessages = Dictionary(grouping: messagesFromServer) { (element) -> Date in
                return element.date.reduceToMonthDayYear()
         }
-       // print(groupedMessages.count)
            // provide a sorting for your keys somehow
            let sortedKeys = groupedMessages.keys.sorted()
            sortedKeys.forEach { (key) in
                let values = groupedMessages[key]
                chatMessages.append(values ?? [])
         }
+        self.tableView.reloadData()
+//        print(chatMessages[1][0].text)
     }
+    
+    func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+     @objc func handleKeyboardWillShow(_ notification: Notification) {
+           let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as AnyObject).cgRectValue
+           let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
+           
+           containerViewBottomAnchor?.constant = -keyboardFrame!.height
+           UIView.animate(withDuration: keyboardDuration!, animations: {
+               self.view.layoutIfNeeded()
+           })
+       }
+       
+       @objc func handleKeyboardWillHide(_ notification: Notification) {
+           let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
+           
+           containerViewBottomAnchor?.constant = 0
+           UIView.animate(withDuration: keyboardDuration!, animations: {
+               self.view.layoutIfNeeded()
+           })
+       }
 
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -135,7 +152,13 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! ChatMessageCell
+        if let profileImageUrl = self.user?.profileImageUrl {
+            if chatMessages[indexPath.section][indexPath.row].isIncoming == true  {
+                cell.profileImageView.loadImageUsingCacheWithUrlString(profileImageUrl)
+            }
+        }
         let chat = chatMessages[indexPath.section][indexPath.row]
                 
         cell.chatMessage = chat
@@ -164,20 +187,21 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
                 return
             }
             
-            let userMessagesRef = Database.database().reference().child("user_messages").child(fromId)
-            let messageId = childRef.key
-            let subValues = [messageId:1]
-            userMessagesRef.updateChildValues(subValues)
+            guard let messageId = childRef.key else {
+                return
+            }
             
-            let recipientUserMessagesRef = Database.database().reference().child("user_messages").child(self.sendToId)
-            recipientUserMessagesRef.updateChildValues(subValues)
-            self.observeMessages()
+            let userMessagesRef = Database.database().reference().child("user_messages").child(fromId).child(messageId)
+            userMessagesRef.setValue(1)
+            
+            let recipientUserMessagesRef = Database.database().reference().child("user_messages").child(self.sendToId).child(messageId)
+            recipientUserMessagesRef.setValue(1)
             self.inputTextField.text = ""
         }
     }
        
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-       // handleSend()
+        handleSend()
         return true
     }
     
@@ -191,7 +215,10 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         //ios9 constraint anchors
         //x,y,w,h
         containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+               
+        containerViewBottomAnchor = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        containerViewBottomAnchor?.isActive = true
+               
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
                
@@ -228,6 +255,13 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         tableView.anchor(top: view.topAnchor, left: view.leadingAnchor, bottom: separatorLineView.topAnchor, right: view.trailingAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
     }
     
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         //navigationItem.title = "Messages"
@@ -236,7 +270,8 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         tableView.backgroundColor = UIColor(white: 0.95, alpha: 1)
         tableView.showsVerticalScrollIndicator = false
         setupConstraints()
-        observeMessages()
+        setupKeyboardObservers()
+       // observeMessages()
     }
 
 }

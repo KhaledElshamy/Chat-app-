@@ -28,11 +28,11 @@ class NewMessageController: UITableViewController {
         ref.observe(.childAdded, with: { (snapchot) in
             if let dict = snapchot.value as? [String:Any] {
                // print(dict)
-                let user = User()
-                user.email = dict["email"] as? String
-                user.name = dict["name"] as? String
-                user.profileImageUrl = dict["profileImageUrl"] as? String
-                user.id  = snapchot.key
+                let user = User(dictionary: dict)
+//                user.email = dict["email"] as? String
+//                user.name = dict["name"] as? String
+//                user.profileImageUrl = dict["profileImageUrl"] as? String
+//                user.id  = snapchot.key
                 self.user.append(user)
                 self.tableView.reloadData()
             }

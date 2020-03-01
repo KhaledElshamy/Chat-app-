@@ -142,17 +142,27 @@ class MessagesController: UITableViewController {
        
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = ChatMessagesController()
-        if let name = self.messages[indexPath.item].name {
-            vc.userName = name
-            vc.navigationItem.title = name
+        let message = messages[indexPath.row]
+              
+        guard let chatPartnerId = message.chatPartnerId() else {
+            return
         }
+              
+        let ref = Database.database().reference().child("users").child(chatPartnerId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+        guard let dictionary = snapshot.value as? [String: AnyObject] else {
+            return
+        }
+                  
+        let user = User(dictionary: dictionary)
+            user.id = chatPartnerId
+            vc.user = user
+        }, withCancel: nil)
         
-        let message = messages[indexPath.item]
         if let id = message.chatPartnerId() {
             vc.sendToId = id
         }
         
- 
         self.navigationController?.pushViewController(vc, animated: true )
     }
        

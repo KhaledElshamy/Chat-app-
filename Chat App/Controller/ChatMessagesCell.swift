@@ -33,7 +33,16 @@ class ChatMessageCell: UITableViewCell {
             }
         }
     }
-        
+    
+    let profileImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -48,6 +57,8 @@ class ChatMessageCell: UITableViewCell {
             addSubview(messageLabel)
             messageLabel.numberOfLines = 0
             messageLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+            addSubview(profileImageView)
             
             // lets set up some constraints for our label
             let constraints = [
@@ -59,10 +70,16 @@ class ChatMessageCell: UITableViewCell {
                 bubbleBackgroundView.leadingAnchor.constraint(equalTo: messageLabel.leadingAnchor, constant: -16),
                 bubbleBackgroundView.bottomAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 16),
                 bubbleBackgroundView.trailingAnchor.constraint(equalTo: messageLabel.trailingAnchor, constant: 16),
+                
+                //x,y,w,h
+                profileImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
+                profileImageView.topAnchor.constraint(equalTo: self.topAnchor),
+                profileImageView.widthAnchor.constraint(equalToConstant: 32),
+                profileImageView.heightAnchor.constraint(equalToConstant: 32),
             ]
             NSLayoutConstraint.activate(constraints)
             
-            leadingConstraint = messageLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32)
+        leadingConstraint = messageLabel.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: 32)
             leadingConstraint.isActive = false
             
             trailingConstraint = messageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32)

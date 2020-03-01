@@ -16,10 +16,11 @@ class ChatMessageCell: UITableViewCell {
         
     var leadingConstraint: NSLayoutConstraint!
     var trailingConstraint: NSLayoutConstraint!
-        
+    
+    static let blueColor = UIColor.rgb(red: 0, green: 137, blue: 249)
     var chatMessage: ChatMessage! {
         didSet {
-            bubbleBackgroundView.backgroundColor = chatMessage.isIncoming ? .white : .darkGray
+            bubbleBackgroundView.backgroundColor = chatMessage.isIncoming ? .white : #colorLiteral(red: 0, green: 0.537254902, blue: 0.9764705882, alpha: 1)
             messageLabel.textColor = chatMessage.isIncoming ? .black : .white
                 
             messageLabel.text = chatMessage.text

@@ -17,6 +17,7 @@
 		0564DE4A2370DE4400F531E0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0564DE492370DE4400F531E0 /* GoogleService-Info.plist */; };
 		181C13652402D2FF00BA2027 /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C13642402D2FF00BA2027 /* NewMessageController.swift */; };
 		181C13682402D93E00BA2027 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C13672402D93E00BA2027 /* User.swift */; };
+		181C54FE240D33AC006C9ED5 /* uploadImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C54FD240D33AC006C9ED5 /* uploadImage.swift */; };
 		1821ECA92403CD760087A1BB /* UsersCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECA82403CD760087A1BB /* UsersCell.swift */; };
 		1821ECAD2403D4C20087A1BB /* LoginController+imagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECAC2403D4C20087A1BB /* LoginController+imagePicker.swift */; };
 		1821ECB22403FECC0087A1BB /* ChatMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECB12403FECC0087A1BB /* ChatMessages.swift */; };
@@ -40,6 +41,7 @@
 		0564DE492370DE4400F531E0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		181C13642402D2FF00BA2027 /* NewMessageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
 		181C13672402D93E00BA2027 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		181C54FD240D33AC006C9ED5 /* uploadImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uploadImage.swift; sourceTree = "<group>"; };
 		1821ECA82403CD760087A1BB /* UsersCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersCell.swift; sourceTree = "<group>"; };
 		1821ECAC2403D4C20087A1BB /* LoginController+imagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginController+imagePicker.swift"; sourceTree = "<group>"; };
 		1821ECB12403FECC0087A1BB /* ChatMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessages.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				1821ECB12403FECC0087A1BB /* ChatMessages.swift */,
 				1821ECB32403FEDB0087A1BB /* ChatMessagesCell.swift */,
 				1821ECB7240420A50087A1BB /* DateHeaderLabel.swift */,
+				181C54FD240D33AC006C9ED5 /* uploadImage.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -268,6 +271,7 @@
 			files = (
 				188E43BE24067B620070D820 /* MyContactsModel.swift in Sources */,
 				1821ECB6240402DE0087A1BB /* ChatMessagesModel.swift in Sources */,
+				181C54FE240D33AC006C9ED5 /* uploadImage.swift in Sources */,
 				0564DE342370B24100F531E0 /* MessagesController.swift in Sources */,
 				181C13652402D2FF00BA2027 /* NewMessageController.swift in Sources */,
 				181C13682402D93E00BA2027 /* User.swift in Sources */,

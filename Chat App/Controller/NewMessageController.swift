@@ -29,10 +29,7 @@ class NewMessageController: UITableViewController {
             if let dict = snapchot.value as? [String:Any] {
                // print(dict)
                 let user = User(dictionary: dict)
-//                user.email = dict["email"] as? String
-//                user.name = dict["name"] as? String
-//                user.profileImageUrl = dict["profileImageUrl"] as? String
-//                user.id  = snapchot.key
+                user.id  = snapchot.key
                 self.user.append(user)
                 self.tableView.reloadData()
             }
@@ -59,11 +56,8 @@ class NewMessageController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = ChatMessagesController()
-        if let name = self.user[indexPath.item].name {
-            vc.userName = name
-            vc.navigationItem.title = name
-        }
-        
+
+        vc.user = user[indexPath.item]
         if let toId = self.user[indexPath.item].id {
             vc.sendToId = toId
         }

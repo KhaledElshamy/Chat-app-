@@ -44,8 +44,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
     var chatMessages = [[ChatMessage]]()
     
     var messages = [MyContactsMessages]()
-    
-    
+
     func observeMessages(){
         guard let uid = Auth.auth().currentUser?.uid else {
             return
@@ -66,11 +65,22 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
                 
                 if message.toId == self.sendToId {
                     self.chatMessages.removeAll()
-                    self.messagesFromServer.append(ChatMessage(text: message.text!, isIncoming: false , date: Date.dateFromCustomString(customString: Date().DateString())))
+                    if let imageUrl = dictionary["imageUrl"] as? String {
+                        print(imageUrl)
+                        self.messagesFromServer.append(ChatMessage(text: "", isIncoming: false , date: Date.dateFromCustomString(customString: Date().DateString()), imageUrl: imageUrl))
+                    }
+                    if let txt = dictionary["text"] as? String {
+                        self.messagesFromServer.append(ChatMessage(text: txt, isIncoming: false , date: Date.dateFromCustomString(customString: Date().DateString()), imageUrl: ""))
+                    }
                     self.attemptToAssembleGroupedMessages()
                 }else if message.toId == Auth.auth().currentUser?.uid && message.fromId == self.sendToId {
                     self.chatMessages.removeAll()
-                    self.messagesFromServer.append(ChatMessage(text: message.text!, isIncoming: true , date: Date.dateFromCustomString(customString: Date().DateString())))
+                   if let imageUrl = dictionary["imageUrl"] as? String {
+                        self.messagesFromServer.append(ChatMessage(text: "", isIncoming: true , date: Date.dateFromCustomString(customString: Date().DateString()), imageUrl: imageUrl))
+                    }
+                    if let txt = dictionary["text"] as? String {
+                        self.messagesFromServer.append(ChatMessage(text: txt, isIncoming: true , date: Date.dateFromCustomString(customString: Date().DateString()), imageUrl: ""))
+                    }
                     self.attemptToAssembleGroupedMessages()
                 }
                 }, withCancel: nil)
@@ -107,16 +117,16 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
            UIView.animate(withDuration: keyboardDuration!, animations: {
                self.view.layoutIfNeeded()
            })
-       }
+    }
        
-       @objc func handleKeyboardWillHide(_ notification: Notification) {
-           let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
+    @objc func handleKeyboardWillHide(_ notification: Notification) {
+        let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
            
-           containerViewBottomAnchor?.constant = 0
-           UIView.animate(withDuration: keyboardDuration!, animations: {
-               self.view.layoutIfNeeded()
-           })
-       }
+        containerViewBottomAnchor?.constant = 0
+        UIView.animate(withDuration: keyboardDuration!, animations: {
+            self.view.layoutIfNeeded()
+        })
+    }
 
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -128,7 +138,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MM/dd/yyyy"
             let dateString = dateFormatter.string(from: firstMessageInSection.date)
-           let label = DateHeaderLabel()
+            let label = DateHeaderLabel()
             label.text = dateString
             
             let containerView = UIView()
@@ -139,8 +149,11 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
             
             return containerView
         }
-        
         return nil
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -159,9 +172,19 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
                 cell.profileImageView.loadImageUsingCacheWithUrlString(profileImageUrl)
             }
         }
+        
         let chat = chatMessages[indexPath.section][indexPath.row]
                 
         cell.chatMessage = chat
+        
+        if chatMessages[indexPath.section][indexPath.row].imageUrl != "" {
+            cell.messageImageView.loadImageUsingCacheWithUrlString(chatMessages[indexPath.section][indexPath.row].imageUrl ?? "")
+            cell.messageImageView.isHidden = false
+            cell.bubbleBackgroundView.backgroundColor = .clear
+        }else {
+            cell.messageImageView.isHidden = true
+        }
+        
         return cell
     }
     
@@ -179,7 +202,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         let fromId = uid
         
         //is it there best thing to include the name inside of the message node
-        let values = ["text": inputTextField.text!, "name": userName,"sendToId":sendToId,"fromId":fromId,"date":date,"timestamp":timestamp] as [String : Any]
+        let values = ["text": inputTextField.text!, "name": user?.name ?? "","sendToId":sendToId,"fromId":fromId,"date":date,"timestamp":timestamp] as [String : Any]
         //childRef.updateChildValues(values)
         childRef.updateChildValues(values) { (error, ref) in
             if error != nil {
@@ -215,7 +238,21 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         //ios9 constraint anchors
         //x,y,w,h
         containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-               
+        
+        let uploadImageView = UIImageView()
+        uploadImageView.isUserInteractionEnabled = true
+        uploadImageView.image = UIImage(named: "upload_image_icon")
+        uploadImageView.translatesAutoresizingMaskIntoConstraints = false
+        uploadImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleUploadTap)))
+        containerView.addSubview(uploadImageView)
+        
+        //x,y,w,h
+        uploadImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
+        uploadImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        uploadImageView.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        uploadImageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        
+        
         containerViewBottomAnchor = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         containerViewBottomAnchor?.isActive = true
                
@@ -227,6 +264,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         sendButton.addTarget(self, action: #selector(handleSend), for: .touchUpInside)
         containerView.addSubview(sendButton)
+        
         //x,y,w,h
         sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
         sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
@@ -235,7 +273,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         
         containerView.addSubview(inputTextField)
         //x,y,w,h
-        inputTextField.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 8).isActive = true
+        inputTextField.leftAnchor.constraint(equalTo: uploadImageView.rightAnchor, constant: 8).isActive = true
         inputTextField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
         inputTextField.rightAnchor.constraint(equalTo: sendButton.leftAnchor).isActive = true
         inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
@@ -267,10 +305,11 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         //navigationItem.title = "Messages"
         tableView.register(ChatMessageCell.self, forCellReuseIdentifier: cellId)
         tableView.separatorStyle = .none
-        tableView.backgroundColor = UIColor(white: 0.95, alpha: 1)
         tableView.showsVerticalScrollIndicator = false
         setupConstraints()
         setupKeyboardObservers()
+        tableView.keyboardDismissMode = .interactive
+        tableView.backgroundColor = .white
        // observeMessages()
     }
 

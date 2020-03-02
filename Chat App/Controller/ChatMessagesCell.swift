@@ -18,9 +18,10 @@ class ChatMessageCell: UITableViewCell {
     var trailingConstraint: NSLayoutConstraint!
     
     static let blueColor = UIColor.rgb(red: 0, green: 137, blue: 249)
+    let whiteColor = UIColor(white: 0.95, alpha: 1)
     var chatMessage: ChatMessage! {
         didSet {
-            bubbleBackgroundView.backgroundColor = chatMessage.isIncoming ? .white : #colorLiteral(red: 0, green: 0.537254902, blue: 0.9764705882, alpha: 1)
+            bubbleBackgroundView.backgroundColor = chatMessage.isIncoming ? whiteColor : #colorLiteral(red: 0, green: 0.537254902, blue: 0.9764705882, alpha: 1)
             messageLabel.textColor = chatMessage.isIncoming ? .black : .white
                 
             messageLabel.text = chatMessage.text
@@ -36,6 +37,15 @@ class ChatMessageCell: UITableViewCell {
     }
     
     let profileImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    
+    let messageImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 16
@@ -60,6 +70,8 @@ class ChatMessageCell: UITableViewCell {
             messageLabel.translatesAutoresizingMaskIntoConstraints = false
         
             addSubview(profileImageView)
+        
+            bubbleBackgroundView.addSubview(messageImageView)
             
             // lets set up some constraints for our label
             let constraints = [
@@ -74,9 +86,14 @@ class ChatMessageCell: UITableViewCell {
                 
                 //x,y,w,h
                 profileImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
-                profileImageView.topAnchor.constraint(equalTo: self.topAnchor),
+                profileImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor,constant: -16),
                 profileImageView.widthAnchor.constraint(equalToConstant: 32),
                 profileImageView.heightAnchor.constraint(equalToConstant: 32),
+                
+                messageImageView.leftAnchor.constraint(equalTo: bubbleBackgroundView.leftAnchor),
+                messageImageView.topAnchor.constraint(equalTo: bubbleBackgroundView.topAnchor),
+                messageImageView.widthAnchor.constraint(equalTo: bubbleBackgroundView.widthAnchor),
+                messageImageView.heightAnchor.constraint(equalTo: bubbleBackgroundView.heightAnchor),
             ]
             NSLayoutConstraint.activate(constraints)
             

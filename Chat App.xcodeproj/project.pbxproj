@@ -25,6 +25,7 @@
 		1821ECB6240402DE0087A1BB /* ChatMessagesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECB5240402DE0087A1BB /* ChatMessagesModel.swift */; };
 		1821ECB8240420A50087A1BB /* DateHeaderLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821ECB7240420A50087A1BB /* DateHeaderLabel.swift */; };
 		188E43BE24067B620070D820 /* MyContactsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188E43BD24067B620070D820 /* MyContactsModel.swift */; };
+		18D22B45240EB42300D3B900 /* IconImoji.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D22B44240EB42300D3B900 /* IconImoji.swift */; };
 		7A814A8AC74AA0D6A2F7044E /* Pods_Chat_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3B9AA55A454646A5308001D /* Pods_Chat_App.framework */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +51,7 @@
 		1821ECB7240420A50087A1BB /* DateHeaderLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateHeaderLabel.swift; sourceTree = "<group>"; };
 		188E43BD24067B620070D820 /* MyContactsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyContactsModel.swift; sourceTree = "<group>"; };
 		18C2E9022402868100CA2537 /* Chat App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Chat App.entitlements"; sourceTree = "<group>"; };
+		18D22B44240EB42300D3B900 /* IconImoji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconImoji.swift; sourceTree = "<group>"; };
 		551A03BC72A83D4C8B8405A5 /* Pods-Chat App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chat App.debug.xcconfig"; path = "Target Support Files/Pods-Chat App/Pods-Chat App.debug.xcconfig"; sourceTree = "<group>"; };
 		B3B9AA55A454646A5308001D /* Pods_Chat_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Chat_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D73BE236DA9CDADC707BD31B /* Pods-Chat App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chat App.release.xcconfig"; path = "Target Support Files/Pods-Chat App/Pods-Chat App.release.xcconfig"; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 				1821ECB32403FEDB0087A1BB /* ChatMessagesCell.swift */,
 				1821ECB7240420A50087A1BB /* DateHeaderLabel.swift */,
 				181C54FD240D33AC006C9ED5 /* uploadImage.swift */,
+				18D22B44240EB42300D3B900 /* IconImoji.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				0564DE482370B5BA00F531E0 /* LoginController.swift in Sources */,
 				0564DE452370B3DB00F531E0 /* Extensions.swift in Sources */,
 				1821ECA92403CD760087A1BB /* UsersCell.swift in Sources */,
+				18D22B45240EB42300D3B900 /* IconImoji.swift in Sources */,
 				0564DE322370B24100F531E0 /* AppDelegate.swift in Sources */,
 				1821ECAD2403D4C20087A1BB /* LoginController+imagePicker.swift in Sources */,
 				1821ECB22403FECC0087A1BB /* ChatMessages.swift in Sources */,

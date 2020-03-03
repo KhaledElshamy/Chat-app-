@@ -18,6 +18,8 @@ class MyContactsMessages: NSObject {
     var name:String?
     var timestamp: NSNumber?
     var imageUrl: String?
+    var imageHeight:NSNumber?
+    var imageWidth:NSNumber?
     
     init(dictionary: [String: Any]) {
         self.fromId = dictionary["fromId"] as? String
@@ -27,6 +29,8 @@ class MyContactsMessages: NSObject {
         self.name = dictionary["name"] as? String
         self.timestamp = dictionary["timestamp"] as? NSNumber
         self.imageUrl = dictionary["imageUrl"] as? String
+        self.imageHeight = dictionary["imageHeight"] as? NSNumber
+        self.imageWidth = dictionary["imageWidth"] as? NSNumber
     }
     
     func chatPartnerId() -> String? {

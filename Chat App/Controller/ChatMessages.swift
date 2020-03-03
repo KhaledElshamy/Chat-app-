@@ -19,6 +19,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
             observeMessages()
         }
     }
+    
     var userName = String()
     var sendToId = String()
     
@@ -37,6 +38,50 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.delegate = self
         return textField
+    }()
+    
+    let iconsContainerView: UIView = {
+        let containerView = UIView()
+        containerView.backgroundColor = .white
+
+        // configuration options
+        let iconHeight: CGFloat = 38
+        let padding: CGFloat = 6
+        
+        let images = [#imageLiteral(resourceName: "blue_like"), #imageLiteral(resourceName: "red_heart"), #imageLiteral(resourceName: "surprised"), #imageLiteral(resourceName: "cry_laugh"), #imageLiteral(resourceName: "cry"), #imageLiteral(resourceName: "angry")]
+        
+        let arrangedSubviews = images.map({ (image) -> UIView in
+            let imageView = UIImageView(image: image)
+            imageView.layer.cornerRadius = iconHeight / 2
+            // required for hit testing
+            imageView.isUserInteractionEnabled = true
+            return imageView
+        })
+        
+        let stackView = UIStackView(arrangedSubviews: arrangedSubviews)
+        stackView.distribution = .fillEqually
+        
+        stackView.spacing = padding
+        stackView.layoutMargins = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
+        stackView.isLayoutMarginsRelativeArrangement = true
+        
+        containerView.addSubview(stackView)
+        
+        let numIcons = CGFloat(arrangedSubviews.count)
+        let width =  numIcons * iconHeight + (numIcons + 1) * padding
+        
+        containerView.frame = CGRect(x: 0, y: 0, width: width, height: iconHeight + 2 * padding)
+        containerView.layer.cornerRadius = containerView.frame.height / 2
+        
+        // shadow
+        containerView.layer.shadowColor = UIColor(white: 0.4, alpha: 0.4).cgColor
+        containerView.layer.shadowRadius = 8
+        containerView.layer.shadowOpacity = 0.5
+        containerView.layer.shadowOffset = CGSize(width: 0, height: 4)
+        
+        stackView.frame = containerView.frame
+        
+        return containerView
     }()
     
     fileprivate let cellId = "id123"
@@ -61,25 +106,25 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
                 }
                 
                 let message = MyContactsMessages(dictionary: dictionary)
-                
+                    
                 
                 if message.toId == self.sendToId {
                     self.chatMessages.removeAll()
                     if let imageUrl = dictionary["imageUrl"] as? String {
                         print(imageUrl)
-                        self.messagesFromServer.append(ChatMessage(text: "", isIncoming: false , date: Date.dateFromCustomString(customString: Date().DateString()), imageUrl: imageUrl))
+                        self.messagesFromServer.append(ChatMessage(text: "", isIncoming: false , date: Date.dateFromCustomString(customString: message.date ?? ""), imageUrl: imageUrl))
                     }
                     if let txt = dictionary["text"] as? String {
-                        self.messagesFromServer.append(ChatMessage(text: txt, isIncoming: false , date: Date.dateFromCustomString(customString: Date().DateString()), imageUrl: ""))
+                        self.messagesFromServer.append(ChatMessage(text: txt, isIncoming: false , date: Date.dateFromCustomString(customString: message.date ?? ""), imageUrl: ""))
                     }
                     self.attemptToAssembleGroupedMessages()
                 }else if message.toId == Auth.auth().currentUser?.uid && message.fromId == self.sendToId {
                     self.chatMessages.removeAll()
                    if let imageUrl = dictionary["imageUrl"] as? String {
-                        self.messagesFromServer.append(ChatMessage(text: "", isIncoming: true , date: Date.dateFromCustomString(customString: Date().DateString()), imageUrl: imageUrl))
+                        self.messagesFromServer.append(ChatMessage(text: "", isIncoming: true , date: Date.dateFromCustomString(customString: message.date ?? ""), imageUrl: imageUrl))
                     }
                     if let txt = dictionary["text"] as? String {
-                        self.messagesFromServer.append(ChatMessage(text: txt, isIncoming: true , date: Date.dateFromCustomString(customString: Date().DateString()), imageUrl: ""))
+                        self.messagesFromServer.append(ChatMessage(text: txt, isIncoming: true , date: Date.dateFromCustomString(customString: message.date ?? ""), imageUrl: ""))
                     }
                     self.attemptToAssembleGroupedMessages()
                 }
@@ -176,6 +221,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         let chat = chatMessages[indexPath.section][indexPath.row]
                 
         cell.chatMessage = chat
+        cell.chatLogController = self 
         
         if chatMessages[indexPath.section][indexPath.row].imageUrl != "" {
             cell.messageImageView.loadImageUsingCacheWithUrlString(chatMessages[indexPath.section][indexPath.row].imageUrl ?? "")
@@ -186,6 +232,13 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         }
         
         return cell
+    }
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if chatMessages[indexPath.section][indexPath.row].imageUrl != "" {
+            
+        }
     }
     
     
@@ -227,6 +280,69 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         handleSend()
         return true
     }
+    
+    var startingFrame: CGRect?
+    var blackBackgroundView: UIView?
+    var startingImageView: UIImageView?
+        //my custom zooming logic
+    func performZoomInForStartingImageView(_ startingImageView: UIImageView) {
+            
+        self.startingImageView = startingImageView
+        self.startingImageView?.isHidden = true
+            
+        startingFrame = startingImageView.superview?.convert(startingImageView.frame, to: nil)
+            
+        let zoomingImageView = UIImageView(frame: startingFrame!)
+        zoomingImageView.backgroundColor = UIColor.red
+        zoomingImageView.image = startingImageView.image
+        zoomingImageView.isUserInteractionEnabled = true
+        zoomingImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleZoomOut)))
+            
+        if let keyWindow = UIApplication.shared.keyWindow {
+            blackBackgroundView = UIView(frame: keyWindow.frame)
+            blackBackgroundView?.backgroundColor = UIColor.black
+            blackBackgroundView?.alpha = 0
+            keyWindow.addSubview(blackBackgroundView!)
+                
+            keyWindow.addSubview(zoomingImageView)
+                
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                    self.blackBackgroundView?.alpha = 1
+                    self.view.alpha = 0
+                    
+                    // math?
+                    // h2 / w1 = h1 / w1
+                    // h2 = h1 / w1 * w1
+                    let height = self.startingFrame!.height / self.startingFrame!.width * keyWindow.frame.width
+                    
+                    zoomingImageView.frame = CGRect(x: 0, y: 0, width: keyWindow.frame.width, height: height)
+                    
+                    zoomingImageView.center = keyWindow.center
+                    
+                    }, completion: { (completed) in
+    //                    do nothing
+                })
+                
+            }
+    }
+        
+    @objc func handleZoomOut(_ tapGesture: UITapGestureRecognizer) {
+        if let zoomOutImageView = tapGesture.view {
+                //need to animate back out to controller
+            zoomOutImageView.layer.cornerRadius = 16
+            zoomOutImageView.clipsToBounds = true
+                
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                    zoomOutImageView.frame = self.startingFrame!
+                    self.blackBackgroundView?.alpha = 0
+                    self.view.alpha = 1
+                    
+                }, completion: { (completed) in
+                    zoomOutImageView.removeFromSuperview()
+                    self.startingImageView?.isHidden = false
+                })
+            }
+        }
     
     func setupConstraints(){
         
@@ -310,6 +426,7 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         setupKeyboardObservers()
         tableView.keyboardDismissMode = .interactive
         tableView.backgroundColor = .white
+        setupLongPressGesture()
        // observeMessages()
     }
 

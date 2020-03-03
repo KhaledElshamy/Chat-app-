@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 class ChatMessageCell: UITableViewCell {
     
     let messageLabel = UILabel()
@@ -16,16 +15,28 @@ class ChatMessageCell: UITableViewCell {
         
     var leadingConstraint: NSLayoutConstraint!
     var trailingConstraint: NSLayoutConstraint!
+    var chatLogController: ChatMessagesController?
     
     static let blueColor = UIColor.rgb(red: 0, green: 137, blue: 249)
     let whiteColor = UIColor(white: 0.95, alpha: 1)
     var chatMessage: ChatMessage! {
         didSet {
-            bubbleBackgroundView.backgroundColor = chatMessage.isIncoming ? whiteColor : #colorLiteral(red: 0, green: 0.537254902, blue: 0.9764705882, alpha: 1)
-            messageLabel.textColor = chatMessage.isIncoming ? .black : .white
-                
-            messageLabel.text = chatMessage.text
-                
+            if chatMessage.imageUrl != "" {
+                messageImageView.loadImageUsingCacheWithUrlString(chatMessage.imageUrl ?? "")
+                messageImageView.isHidden = false
+                bubbleBackgroundView.backgroundColor = .clear
+                messageLabel.isHidden = true
+                bubbleBackgroundView.widthAnchor.constraint(equalToConstant: 200).isActive = true
+                bubbleBackgroundView.heightAnchor.constraint(equalToConstant: 200).isActive = true
+            }else {
+                bubbleBackgroundView.backgroundColor = chatMessage.isIncoming ? whiteColor : #colorLiteral(red: 0, green: 0.537254902, blue: 0.9764705882, alpha: 1)
+                messageLabel.textColor = chatMessage.isIncoming ? .black : .white
+                    
+                messageLabel.text = chatMessage.text
+                messageImageView.isHidden = true
+                messageLabel.isHidden = false
+            }
+            
             if chatMessage.isIncoming {
                 leadingConstraint.isActive = true
                 trailingConstraint.isActive = false
@@ -45,18 +56,26 @@ class ChatMessageCell: UITableViewCell {
         return imageView
     }()
     
-    let messageImageView: UIImageView = {
+    lazy var  messageImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 16
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleZoomTap(_ :))))
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
+    @objc func handleZoomTap(_ tapGesture: UITapGestureRecognizer) {
+           if let imageView = tapGesture.view as? UIImageView {
+               //PRO Tip: don't perform a lot of custom logic inside of a view class
+               self.chatLogController?.performZoomInForStartingImageView(imageView)
+        }
+    }
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
             selectionStyle = .none
             backgroundColor = .clear
             
@@ -72,9 +91,10 @@ class ChatMessageCell: UITableViewCell {
             addSubview(profileImageView)
         
             bubbleBackgroundView.addSubview(messageImageView)
+        var constraints = [NSLayoutConstraint]()
             
             // lets set up some constraints for our label
-            let constraints = [
+             constraints = [
                 messageLabel.topAnchor.constraint(equalTo: topAnchor, constant: 32),
                 messageLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32),
                 messageLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 250),

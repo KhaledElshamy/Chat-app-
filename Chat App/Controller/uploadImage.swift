@@ -57,21 +57,20 @@ extension ChatMessagesController: UIImagePickerControllerDelegate, UINavigationC
                         return
                     }
                     
-                    self.sendMessageWithImageUrl(url?.absoluteString ?? "")
+                    self.sendMessageWithImageUrl(url?.absoluteString ?? "",image: image)
                 })
-                
             })
         }
     }
     
-    fileprivate func sendMessageWithImageUrl(_ imageUrl: String) {
+    fileprivate func sendMessageWithImageUrl(_ imageUrl: String,image:UIImage) {
         let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
         let toId = user!.id!
         let fromId = Auth.auth().currentUser!.uid
         let timestamp = Int(Date().timeIntervalSince1970)
         
-        let values = ["imageUrl": imageUrl, "sendToId": toId, "fromId": fromId, "timestamp": timestamp] as [String : Any]
+        let values = ["imageUrl": imageUrl, "sendToId": toId, "fromId": fromId, "timestamp": timestamp,"imageWidth":image.size.width ,"imageHeight":image.size.height] as [String : Any]
         
         childRef.updateChildValues(values) { (error, ref) in
             if error != nil {

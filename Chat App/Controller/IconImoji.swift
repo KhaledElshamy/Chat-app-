@@ -10,6 +10,7 @@ import UIKit
 
 
 extension ChatMessagesController {
+    
      func setupLongPressGesture() {
           view.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress)))
       }
@@ -34,14 +35,14 @@ extension ChatMessagesController {
               })
               
               
-          } else if gesture.state == .changed {
+          }else if gesture.state == .changed {
               handleGestureChanged(gesture: gesture)
           }
       }
       
       fileprivate func handleGestureChanged(gesture: UILongPressGestureRecognizer) {
           let pressedLocation = gesture.location(in: self.iconsContainerView)
-          print(pressedLocation)
+          //print(pressedLocation)
           
           let fixedYLocation = CGPoint(x: pressedLocation.x, y: self.iconsContainerView.frame.height / 2)
           
@@ -66,7 +67,7 @@ extension ChatMessagesController {
           view.addSubview(iconsContainerView)
           
           let pressedLocation = gesture.location(in: self.view)
-          print(pressedLocation)
+          //print(pressedLocation)
           
           // transformation of the red box
           let centeredX = (view.frame.width - iconsContainerView.frame.width) / 2
@@ -77,7 +78,7 @@ extension ChatMessagesController {
           UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
               
               self.iconsContainerView.alpha = 1
-              self.iconsContainerView.transform = CGAffineTransform(translationX: centeredX, y: pressedLocation.y - self.iconsContainerView.frame.height)
+              self.iconsContainerView.transform = CGAffineTransform(translationX: centeredX, y: pressedLocation.y - self.iconsContainerView.frame.height) 
           })
       }
       

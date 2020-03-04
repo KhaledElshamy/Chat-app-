@@ -26,7 +26,6 @@ class ChatMessageCell: UITableViewCell {
                 messageImageView.isHidden = false
                 bubbleBackgroundView.backgroundColor = .clear
                 messageLabel.isHidden = true
-                bubbleBackgroundView.widthAnchor.constraint(equalToConstant: 200).isActive = true
                 bubbleBackgroundView.heightAnchor.constraint(equalToConstant: 200).isActive = true
             }else {
                 bubbleBackgroundView.backgroundColor = chatMessage.isIncoming ? whiteColor : #colorLiteral(red: 0, green: 0.537254902, blue: 0.9764705882, alpha: 1)
@@ -74,11 +73,17 @@ class ChatMessageCell: UITableViewCell {
         }
     }
     
+    
+    @objc func showImojis(){
+        self.chatLogController?.setupLongPressGesture()
+    }
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
             selectionStyle = .none
             backgroundColor = .clear
             
+        bubbleBackgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showImojis)))
             bubbleBackgroundView.layer.cornerRadius = 12
             bubbleBackgroundView.translatesAutoresizingMaskIntoConstraints = false
             addSubview(bubbleBackgroundView)

@@ -426,8 +426,6 @@ class ChatMessagesController:UIViewController,UITableViewDelegate,UITableViewDat
         setupKeyboardObservers()
         tableView.keyboardDismissMode = .interactive
         tableView.backgroundColor = .white
-        setupLongPressGesture()
        // observeMessages()
     }
-
 }

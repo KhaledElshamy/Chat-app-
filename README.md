@@ -9,4 +9,4 @@ It's an example for chat app base on Google firebase, messages are delivered in 
 3. react on messages using emojis 
 
 ## Video 
-<img align="center" src="Resources/ChatVideo.gif" width="20%" />
+<img align="center" src="Resources/ChatVideo.mov" width="20%" />
